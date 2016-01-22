@@ -2179,8 +2179,14 @@
         // finish targets
         targets.forEach(function (t) {
             var i;
+            var j=0;
             // sort values by its x
             if (config.data_xSort) {
+                //Keep original index 
+                t.values.forEach(function(v){
+                    v.ori_index=j++;
+                })
+
                 t.values = t.values.sort(function (v1, v2) {
                     var x1 = v1.x || v1.x === 0 ? v1.x : Infinity,
                         x2 = v2.x || v2.x === 0 ? v2.x : Infinity;
@@ -3866,11 +3872,17 @@
             if (! (d[i] && (d[i].value || d[i].value === 0))) { continue; }
 
             if (! text) {
-                title = titleFormat ? titleFormat(d[i].x) : d[i].x;
+                if (d[i].ori_index !== undefined)
+                    title = titleFormat(d[i].x, d[i].ori_index);
+                else
+                    title = titleFormat(d[i].x, d[i].index);
                 text = "<table class='" + $$.CLASS.tooltip + "'>" + (title || title === 0 ? "<tr><th colspan='2'>" + title + "</th></tr>" : "");
             }
-
-            value = valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index);
+            //check if original index exist
+            if (d[i].ori_index !== undefined)
+                value = valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index, d[i].ori_index)
+            else
+                value = valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index);
             if (value !== undefined) {
                 // Skip elements when their name is set to null
                 if (d[i].name === null) { continue; }
